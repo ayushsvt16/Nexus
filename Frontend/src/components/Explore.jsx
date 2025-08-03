@@ -5,7 +5,7 @@ import doubleArrowIcon from '../assets/doublearrow.svg';
 const Explore = () => {
   return (
     <div className="p-4 max-w-sm space-y-4">
-      <button className="flex items-center justify-between w-full bg-gradient-to-r from-pink-500 to-orange-400 text-white font-semibold px-2 py-3 rounded-lg hover:opacity-90">
+      <button className="flex items-center justify-between w-full bg-gradient-to-r from-red-500 to-orange-400 text-white font-semibold px-2 py-3 rounded-lg hover:opacity-80">
         <div className="flex items-center space-x-2">
           <img src={fileIcon} alt="PYQ Icon" className="h-8 w-8" />
           <span>Explore PYQs</span>

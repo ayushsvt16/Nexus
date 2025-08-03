@@ -11,6 +11,7 @@ export default {
       },
       colors: {
         'brand-background': '#F7F0E8',
+        'lorange-background': '#F4DAC4',
       },
     },
   },
