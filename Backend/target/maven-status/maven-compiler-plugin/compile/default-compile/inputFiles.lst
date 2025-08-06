@@ -1,5 +1,8 @@
-C:\Users\tshiv\OneDrive\Desktop\nexusproject\src\main\java\com\nexus\nexusproject\Controller\LoginController.java
-C:\Users\tshiv\OneDrive\Desktop\nexusproject\src\main\java\com\nexus\nexusproject\model\LoginUser.java
-C:\Users\tshiv\OneDrive\Desktop\nexusproject\src\main\java\com\nexus\nexusproject\NexusprojectApplication.java
-C:\Users\tshiv\OneDrive\Desktop\nexusproject\src\main\java\com\nexus\nexusproject\Repository\LoginRepository.java
-C:\Users\tshiv\OneDrive\Desktop\nexusproject\src\main\java\com\nexus\nexusproject\Service\LoginService.java
+C:\Users\tshiv\OneDrive\Desktop\nexusproject\Backend\src\main\java\com\nexus\nexusproject\Controller\AuthController.java
+C:\Users\tshiv\OneDrive\Desktop\nexusproject\Backend\src\main\java\com\nexus\nexusproject\DTO\AuthResponse.java
+C:\Users\tshiv\OneDrive\Desktop\nexusproject\Backend\src\main\java\com\nexus\nexusproject\DTO\LoginRequest.java
+C:\Users\tshiv\OneDrive\Desktop\nexusproject\Backend\src\main\java\com\nexus\nexusproject\DTO\SignUpRequest.java
+C:\Users\tshiv\OneDrive\Desktop\nexusproject\Backend\src\main\java\com\nexus\nexusproject\model\User.java
+C:\Users\tshiv\OneDrive\Desktop\nexusproject\Backend\src\main\java\com\nexus\nexusproject\NexusprojectApplication.java
+C:\Users\tshiv\OneDrive\Desktop\nexusproject\Backend\src\main\java\com\nexus\nexusproject\Repository\UserRepository.java
+C:\Users\tshiv\OneDrive\Desktop\nexusproject\Backend\src\main\java\com\nexus\nexusproject\Service\UserService.java
