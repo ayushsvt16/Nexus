@@ -59,7 +59,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="absolute top-16 left-0 w-full bg-white border-b shadow-md md:hidden">
+        <div className="absolute top-16 left-0 w-full bg-white border-b shadow-md md:hidden z-50">
           <div className="flex flex-col space-y-2 p-4">
             <a className="hover:text-orange-500">
               Home
@@ -73,13 +73,13 @@ const Navbar = () => {
               <summary className="cursor-pointer hover:text-orange-500">
                 Feedback
               </summary>                
-              </details>
-              <button className="bg-black text-white px-4 py-2 rounded-md hover:opacity-80">
-                Log In
-              </button>
-            </div>
+            </details>
+            <button className="bg-black text-white px-4 py-2 rounded-md hover:opacity-80">
+              Log In
+            </button>
           </div>
-        )}
+        </div>
+      )}
       </nav>
     );
   };
