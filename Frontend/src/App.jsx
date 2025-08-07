@@ -1,16 +1,71 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/navbar';
 import Hero from './components/hero';
 import Explore from './components/Explore';
 import Comingsoon from './components/comingsoon';
+import ExamVault from './components/ExamVault';
+import Login from './components/Login';
 
+// Layout wrapper component to handle conditional styling
+const Layout = ({ children, user, showLogin, handleLogout, handleLoginClick, onLogin, setShowLogin }) => {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+  
+  return (
+    <div className={`bg-brand-background min-h-screen font-inter ${
+      isHomePage 
+        ? 'bg-right-top bg-no-repeat bg-none md:bg-[url(\'./assets/bg.png\')]' 
+        : ''
+    }`}>
+      <Navbar 
+        userInitials={user?.initials}
+        userName={user?.name}
+        isLoggedIn={!!user}
+        onLogout={handleLogout}
+        onLoginClick={handleLoginClick}
+      />
+      
+      {children}
+      
+      {showLogin && (
+        <Login 
+          onLogin={onLogin}
+          onClose={() => setShowLogin(false)}
+        />
+      )}
+    </div>
+  );
+};
 
 function App() {
-  return (
-    <div
-      className="bg-brand-background min-h-screen font-inter bg-right-top bg-no-repeat bg-none md:bg-[url('./assets/bg.png')] "     
-    >
-      <Navbar />
+  const [user, setUser] = useState(null);
+  const [showLogin, setShowLogin] = useState(false);
+
+  // Check for existing user session on app load
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+    setShowLogin(false);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+  };
+
+  const handleLoginClick = () => {
+    setShowLogin(true);
+  };
+
+  const HomePage = () => (
+    <>
       <main className="container mx-auto py-8 md:px-10 px-4">
         <div className="space-y-4">
           <Hero />
@@ -20,7 +75,25 @@ function App() {
       <div className="mx-12 mt-10">
         <Comingsoon />
       </div>
-    </div>
+    </>
+  );
+
+  return (
+    <Router>
+      <Layout
+        user={user}
+        showLogin={showLogin}
+        handleLogout={handleLogout}
+        handleLoginClick={handleLoginClick}
+        onLogin={handleLogin}
+        setShowLogin={setShowLogin}
+      >
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/exam-vault" element={<ExamVault />} />
+        </Routes>
+      </Layout>
+    </Router>
   );
 }
 
