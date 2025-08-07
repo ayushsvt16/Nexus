@@ -1,8 +1,15 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import DropdownIcon from "../assets/dropdown.svg";
 
-const Navbar = () => {
+const Navbar = ({ userInitials, userName, onLogout, isLoggedIn, onLoginClick }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const handleLogout = () => {
+    setShowUserMenu(false);
+    onLogout();
+  };
 
   return (
     <nav className=" font-inter flex items-center justify-between px-16 py-3 border-b-2 bg-white shadow">
@@ -15,21 +22,16 @@ const Navbar = () => {
 
       {/* Desktop Menu */}
       <div className="hidden md:flex items-center space-x-6">
-        {/* Exam Vault */}
+        {/* Home */}
         <div className="flex items-center space-x-1 hover:text-orange-500 cursor-pointer">
-          <a className="flex items-center space-x-1">
+          <Link to="/" className="flex items-center space-x-1">
             <span>Home</span>            
-          </a>
+          </Link>
         </div>
         <div className="relative group">
-          <button className="hover:text-orange-500 flex items-center space-x-2">
-            <span>Exam Vault</span>
-            <img
-              src={DropdownIcon}
-              alt="Dropdown"
-              className="w-3 h-3 transition-transform duration-200 group-hover:rotate-180 relative top-[1px]"
-            />
-          </button>          
+          <Link to="/exam-vault" className="hover:text-orange-500 flex items-center space-x-2">
+            <span>Exam Vault</span>          
+          </Link>          
         </div>
 
         {/* Feedback */}
@@ -44,10 +46,41 @@ const Navbar = () => {
           </button>          
         </div>
 
-        {/* Sign Up */}
-        <button className="bg-black text-white px-4 py-2 rounded-md hover:opacity-80">
-          Log In
-        </button>
+        {/* User Section */}
+        {isLoggedIn ? (
+          <div className="relative">
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center text-sm font-medium hover:bg-gray-700 transition"
+              title={userName}
+            >
+              {userInitials}
+            </button>
+            
+            {showUserMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
+                <div className="py-1">
+                  <div className="px-4 py-2 text-sm text-gray-700 border-b">
+                    {userName}
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <button
+            onClick={onLoginClick}
+            className="bg-black text-white px-4 py-2 rounded-md hover:opacity-80 transition"
+          >
+            Log In
+          </button>
+        )}
       </div>
 
       {/* Mobile Menu Button */}
@@ -61,12 +94,12 @@ const Navbar = () => {
       {isOpen && (
         <div className="absolute top-16 left-0 w-full bg-white border-b shadow-md md:hidden z-50">
           <div className="flex flex-col space-y-2 p-4">
-            <a className="hover:text-orange-500">
+            <Link to="/" className="hover:text-orange-500">
               Home
-            </a>
+            </Link>
             <details>
               <summary className="cursor-pointer hover:text-orange-500">
-                Exam Vault
+                <Link to="/exam-vault">Exam Vault</Link>
               </summary>             
             </details>
             <details>
@@ -74,9 +107,25 @@ const Navbar = () => {
                 Feedback
               </summary>                
             </details>
-            <button className="bg-black text-white px-4 py-2 rounded-md hover:opacity-80">
-              Log In
-            </button>
+            
+            {isLoggedIn ? (
+              <div className="border-t pt-2">
+                <div className="text-sm text-gray-600 mb-2">{userName}</div>
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={onLoginClick}
+                className="bg-black text-white px-4 py-2 rounded-md hover:opacity-80 transition"
+              >
+                Log In
+              </button>
+            )}
           </div>
         </div>
       )}
