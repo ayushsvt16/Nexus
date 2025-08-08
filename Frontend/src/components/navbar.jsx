@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom"; // removed useNavigate
 import DropdownIcon from "../assets/dropdown.svg";
 
 const Navbar = ({ userInitials, userName, onLogout, isLoggedIn, onLoginClick }) => {
@@ -13,12 +13,12 @@ const Navbar = ({ userInitials, userName, onLogout, isLoggedIn, onLoginClick }) 
 
   return (
     <nav className=" font-inter flex items-center justify-between px-16 py-3 border-b-2 bg-white shadow">
-      {/* Logo */}
-      <div className="flex items-center space-x-2">
+      {/* Logo -> link to Home */}
+      <Link to="/" aria-label="Go to Home" className="flex items-center space-x-2 cursor-pointer">
         <img src="/src/assets/logo.svg" alt="IIITBH Logo" className="h-6 w-6" />
         <span className="text-xl font-bold text-orange-600">IIITBH</span>
         <span className="text-xl font-bold">Nexus</span>
-      </div>
+      </Link>
 
       {/* Desktop Menu */}
       <div className="hidden md:flex items-center space-x-6">
