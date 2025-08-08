@@ -26,7 +26,7 @@ const Login = ({ onLogin, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    if (isSignUp) {
+  if (isSignUp) {
       // Sign up logic
       const userData = {
         name: formData.name,
@@ -38,14 +38,12 @@ const Login = ({ onLogin, onClose }) => {
       localStorage.setItem('user', JSON.stringify(userData));
       onLogin(userData);
     } else {
-      // Login logic - for demo, use name from form
+      // Login logic - only name and password required for demo
       if (formData.name) {
         const userData = {
           name: formData.name,
-          email: formData.email,
           initials: generateInitials(formData.name)
         };
-        
         localStorage.setItem('user', JSON.stringify(userData));
         onLogin(userData);
       }
@@ -81,18 +79,20 @@ const Login = ({ onLogin, onClose }) => {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
+          {isSignUp && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium mb-1">Password</label>

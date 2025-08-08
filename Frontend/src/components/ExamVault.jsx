@@ -121,7 +121,7 @@ const ExamVault = () => {
     return (
       <div 
         className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-3 md:p-4 hover:shadow-lg transition-all duration-300 cursor-pointer hover:from-red-100 hover:to-red-200 border-2 border-red-300 hover:border-red-400 
-                   flex md:flex-col items-center md:justify-center gap-3 md:gap-0"
+                   flex sm:flex-row md:flex-col items-center md:justify-center gap-3 md:gap-0"
         onClick={handleDownload}
       >
         <div className="w-12 h-12 md:w-16 md:h-16 flex-shrink-0 md:mb-2 md:mb-3 bg-red-200 rounded-full flex items-center justify-center">
@@ -131,7 +131,7 @@ const ExamVault = () => {
           </svg>
         </div>
         <div className="flex-1 md:text-center">
-          <div className="flex items-center gap-2 mb-1 md:justify-center">
+          <div className="flex items-center gap-2 mb-1 justify-start md:justify-center">
             <h3 className="font-bold text-sm md:text-base text-gray-800">{paper.courseCode}</h3>
           </div>
           <p className="text-xs md:text-sm text-gray-700 text-left md:text-center line-clamp-2 font-medium">{paper.courseName}</p>

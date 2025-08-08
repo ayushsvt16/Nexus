@@ -6,6 +6,7 @@ import Explore from './components/Explore';
 import Comingsoon from './components/comingsoon';
 import ExamVault from './components/ExamVault';
 import Login from './components/Login';
+import bg from './assets/bg.png';
 
 // Layout wrapper component to handle conditional styling
 const Layout = ({ children, user, showLogin, handleLogout, handleLoginClick, onLogin, setShowLogin }) => {
@@ -13,11 +14,12 @@ const Layout = ({ children, user, showLogin, handleLogout, handleLoginClick, onL
   const isHomePage = location.pathname === '/';
   
   return (
-    <div className={`bg-brand-background min-h-screen font-inter ${
-      isHomePage 
-        ? 'bg-right-top bg-no-repeat bg-none md:bg-[url(\'./assets/bg.png\')]' 
-        : ''
-    }`}>
+    <div
+      className={`bg-brand-background min-h-screen font-inter ${
+        isHomePage ? 'bg-right-top bg-no-repeat' : ''
+      }`}
+      style={isHomePage ? { backgroundImage: `url(${bg})` } : undefined}
+    >
       <Navbar 
         userInitials={user?.initials}
         userName={user?.name}
