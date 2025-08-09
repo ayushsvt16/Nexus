@@ -1,5 +1,54 @@
-// API service for exam vault
 const API_BASE_URL = 'http://localhost:8080/api'; // Your Spring Boot backend URL
+// ADD these authentication functions
+export const authAPI = {
+  // Login user
+  login: async (loginData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error during login:', error);
+      throw error;
+    }
+  },
+
+  // Sign up user
+  signup: async (signupData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(signupData),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Signup failed');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error during signup:', error);
+      throw error;
+    }
+  }
+};
 
 export const examVaultAPI = {
   // Get all exam papers with filters

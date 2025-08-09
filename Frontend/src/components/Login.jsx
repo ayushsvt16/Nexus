@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { authAPI } from '../services/api'; // ✅ Added import
 
 const Login = ({ onLogin, onClose }) => {
   const [formData, setFormData] = useState({
@@ -23,30 +24,53 @@ const Login = ({ onLogin, onClose }) => {
       .substring(0, 2);
   };
 
-  const handleSubmit = (e) => {
+  // ✅ Replaced handleSubmit function to connect with backend
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-  if (isSignUp) {
-      // Sign up logic
-      const userData = {
-        name: formData.name,
-        email: formData.email,
-        initials: generateInitials(formData.name)
-      };
-      
-      // Store user data in localStorage (for frontend-only persistence)
-      localStorage.setItem('user', JSON.stringify(userData));
-      onLogin(userData);
-    } else {
-      // Login logic - only name and password required for demo
-      if (formData.name) {
-        const userData = {
-          name: formData.name,
-          initials: generateInitials(formData.name)
+
+    try {
+      if (isSignUp) {
+        // Sign up with backend
+        const signupData = {
+          username: formData.name, // Using "name" as username
+          email: formData.email,
+          password: formData.password
         };
-        localStorage.setItem('user', JSON.stringify(userData));
-        onLogin(userData);
+
+        const response = await authAPI.signup(signupData);
+
+        if (response.success) {
+          const userData = {
+            id: response.userId,
+            name: response.username,
+            initials: generateInitials(response.username)
+          };
+          onLogin(userData);
+        } else {
+          alert(response.message || 'Signup failed');
+        }
+      } else {
+        // Login with backend
+        const loginData = {
+          username: formData.name, // Using "name" as username
+          password: formData.password
+        };
+
+        const response = await authAPI.login(loginData);
+
+        if (response.success) {
+          const userData = {
+            id: response.userId,
+            name: response.username,
+            initials: generateInitials(response.username)
+          };
+          onLogin(userData);
+        } else {
+          alert(response.message || 'Login failed');
+        }
       }
+    } catch (error) {
+      alert('Error: ' + error.message);
     }
   };
 
@@ -120,8 +144,8 @@ const Login = ({ onLogin, onClose }) => {
             onClick={() => setIsSignUp(!isSignUp)}
             className="text-orange-600 hover:underline"
           >
-            {isSignUp 
-              ? 'Already have an account? Login' 
+            {isSignUp
+              ? 'Already have an account? Login'
               : "Don't have an account? Sign Up"
             }
           </button>
