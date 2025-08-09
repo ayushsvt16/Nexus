@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/navbar';
 import Hero from './components/hero';
@@ -12,7 +12,7 @@ import bg from './assets/bg.png';
 const Layout = ({ children, user, showLogin, handleLogout, handleLoginClick, onLogin, setShowLogin }) => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
-  
+
   return (
     <div
       className={`bg-brand-background min-h-screen font-inter ${
@@ -44,22 +44,16 @@ function App() {
   const [user, setUser] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
 
-  // Check for existing user session on app load
-  useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
+  // ✅ localStorage useEffect removed
 
   const handleLogin = (userData) => {
     setUser(userData);
     setShowLogin(false);
   };
 
+  // ✅ localStorage.removeItem removed
   const handleLogout = () => {
     setUser(null);
-    localStorage.removeItem('user');
   };
 
   const handleLoginClick = () => {
