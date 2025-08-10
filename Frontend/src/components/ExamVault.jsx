@@ -45,6 +45,13 @@ const ExamVault = () => {
   const [showSemesterDropdown, setShowSemesterDropdown] = useState(false);
   const [showYearDropdown, setShowYearDropdown] = useState(false);
   const [showBranchDropdown, setShowBranchDropdown] = useState(false);
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+
+  // Refs for dropdown containers
+  const semesterDropdownRef = React.useRef(null);
+  const yearDropdownRef = React.useRef(null);
+  const branchDropdownRef = React.useRef(null);
+  const typeDropdownRef = React.useRef(null);
   const [selectedSemester, setSelectedSemester] = useState('I');
   const [selectedBranch, setBranch] = useState('CSE');
   const [selectedYear, setSelectedYear] = useState('2023');
@@ -62,7 +69,28 @@ const ExamVault = () => {
     branch: 'CSE',
   });
   const [uploadFile, setUploadFile] = useState(null);
-  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  // ...existing code...
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (showSemesterDropdown && semesterDropdownRef.current && !semesterDropdownRef.current.contains(event.target)) {
+        setShowSemesterDropdown(false);
+      }
+      if (showYearDropdown && yearDropdownRef.current && !yearDropdownRef.current.contains(event.target)) {
+        setShowYearDropdown(false);
+      }
+      if (showBranchDropdown && branchDropdownRef.current && !branchDropdownRef.current.contains(event.target)) {
+        setShowBranchDropdown(false);
+      }
+      if (showTypeDropdown && typeDropdownRef.current && !typeDropdownRef.current.contains(event.target)) {
+        setShowTypeDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSemesterDropdown, showYearDropdown, showBranchDropdown, showTypeDropdown]);
 
   // Mock data for demonstration
   const mockPapers = [
@@ -255,7 +283,7 @@ const ExamVault = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Type</label>
-                    <div className="relative">
+                    <div className="relative" ref={typeDropdownRef}>
                       <button
                         type="button"
                         className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2"
@@ -273,7 +301,7 @@ const ExamVault = () => {
                             <button
                               key={type}
                               type="button"
-                              className={`w-full text-left px-3 py-2 text-sm hover:bg-orange-100 rounded-md transition-colors ${uploadForm.type === type ? "bg-orange-50 font-semibold text-orange-700" : "text-gray-700"}`}
+                              className={`w-full text-left px-3 text-sm hover:bg-orange-100 rounded-md transition-colors ${uploadForm.type === type ? "bg-orange-50 font-semibold text-orange-700" : "text-gray-700"}`}
                               onClick={() => {
                                 setUploadForm({ ...uploadForm, type });
                                 setShowTypeDropdown(false);
@@ -290,10 +318,10 @@ const ExamVault = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Semester</label>
-                    <div className="relative">
+                    <div className="relative" ref={semesterDropdownRef}>
                       <button
                         type="button"
-                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2"
+                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2"
                         onClick={() => setShowSemesterDropdown((prev) => !prev)}
                         tabIndex={0}
                       >
@@ -303,12 +331,12 @@ const ExamVault = () => {
                         </span>
                       </button>
                       {showSemesterDropdown && (
-                        <div className="absolute left-0 right-0 mt-1 z-10 bg-white border border-gray-200 rounded-md shadow-lg">
+                        <div className="absolute left-0 right-0 z-10 bg-white border border-gray-200 rounded-md shadow-lg">
                           {semesters.map((sem) => (
                             <button
                               key={sem}
                               type="button"
-                              className={`w-full text-left px-3 py-2 text-sm hover:bg-orange-100 rounded-md transition-colors ${uploadForm.semester === sem ? "bg-orange-50 font-semibold text-orange-700" : "text-gray-700"}`}
+                              className={`w-full text-left px-3 text-sm hover:bg-orange-100 rounded-md transition-colors ${uploadForm.semester === sem ? "bg-orange-50 font-semibold text-orange-700" : "text-gray-700"}`}
                               onClick={() => {
                                 setUploadForm({ ...uploadForm, semester: sem });
                                 setShowSemesterDropdown(false);
@@ -323,10 +351,10 @@ const ExamVault = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Year</label>
-                    <div className="relative">
+                    <div className="relative" ref={yearDropdownRef}>
                       <button
                         type="button"
-                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2"
+                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2"
                         onClick={() => setShowYearDropdown((prev) => !prev)}
                         tabIndex={0}
                       >
@@ -336,12 +364,12 @@ const ExamVault = () => {
                         </span>
                       </button>
                       {showYearDropdown && (
-                        <div className="absolute left-0 right-0 mt-1 z-10 bg-white border border-gray-200 rounded-md shadow-lg">
+                        <div className="absolute left-0 right-0 z-10 bg-white border border-gray-200 rounded-md shadow-lg">
                           {["2021","2022","2023","2024"].map((year) => (
                             <button
                               key={year}
                               type="button"
-                              className={`w-full text-left px-3 py-2 text-sm hover:bg-orange-100 rounded-md transition-colors ${uploadForm.year === year ? "bg-orange-50 font-semibold text-orange-700" : "text-gray-700"}`}
+                              className={`w-full text-left px-3 text-sm hover:bg-orange-100 rounded-md transition-colors ${uploadForm.year === year ? "bg-orange-50 font-semibold text-orange-700" : "text-gray-700"}`}
                               onClick={() => {
                                 setUploadForm({ ...uploadForm, year });
                                 setShowYearDropdown(false);
@@ -356,10 +384,10 @@ const ExamVault = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Branch</label>
-                    <div className="relative">
+                    <div className="relative" ref={branchDropdownRef}>
                       <button
                         type="button"
-                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2"
+                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2"
                         onClick={() => setShowBranchDropdown((prev) => !prev)}
                         tabIndex={0}
                       >
@@ -369,12 +397,12 @@ const ExamVault = () => {
                         </span>
                       </button>
                       {showBranchDropdown && (
-                        <div className="absolute left-0 right-0 mt-1 z-10 bg-white border border-gray-200 rounded-md shadow-lg">
+                        <div className="absolute left-0 right-0 z-10 bg-white border border-gray-200 rounded-md shadow-lg">
                           {["CSE","ECE","ME","CE","EE"].map((branch) => (
                             <button
                               key={branch}
                               type="button"
-                              className={`w-full text-left px-3 py-2 text-sm hover:bg-orange-100 rounded-md transition-colors ${uploadForm.branch === branch ? "bg-orange-50 font-semibold text-orange-700" : "text-gray-700"}`}
+                              className={`w-full text-left px-3 text-sm hover:bg-orange-100 rounded-md transition-colors ${uploadForm.branch === branch ? "bg-orange-50 font-semibold text-orange-700" : "text-gray-700"}`}
                               onClick={() => {
                                 setUploadForm({ ...uploadForm, branch });
                                 setShowBranchDropdown(false);
