@@ -1,24 +1,24 @@
 package com.nexus.nexusproject.DTO;
 
 public class SignUpRequest {
-    private String username;
+    private String fullName;
     private String email;
     private String password;
     
     public SignUpRequest() {}
     
-    public SignUpRequest(String username, String email, String password) {
-        this.username = username;
+    public SignUpRequest(String fullName, String email, String password) {
+        this.fullName = fullName;
         this.email = email;
         this.password = password;
     }
     
-    public String getUsername() {
-        return username;
+    public String getFullName() {
+        return fullName;
     }
     
-    public void setUsername(String username) {
-        this.username = username;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
     
     public String getEmail() {

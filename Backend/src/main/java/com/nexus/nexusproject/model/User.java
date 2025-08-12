@@ -16,8 +16,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(unique = true, nullable = false)
-    private String username;
+    @Column(nullable = false)
+    private String fullName;
     
     @Column(unique = true, nullable = false)
     private String email;
@@ -36,8 +36,8 @@ public class User {
         this.updatedAt = LocalDateTime.now();
     }
     
-    public User(String username, String email, String password) {
-        this.username = username;
+    public User(String fullName, String email, String password) {
+        this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.createdAt = LocalDateTime.now();
@@ -53,12 +53,12 @@ public class User {
         this.id = id;
     }
     
-    public String getUsername() {
-        return username;
+    public String getFullName() {
+        return fullName;
     }
     
-    public void setUsername(String username) {
-        this.username = username;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
     
     public String getEmail() {

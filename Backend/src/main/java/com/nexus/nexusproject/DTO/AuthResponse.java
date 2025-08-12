@@ -4,7 +4,8 @@ public class AuthResponse {
     private boolean success;
     private String message;
     private Long userId;
-    private String username;
+    private String fullName;
+    private String email;
     
     public AuthResponse() {}
     
@@ -13,11 +14,12 @@ public class AuthResponse {
         this.message = message;
     }
     
-    public AuthResponse(boolean success, String message, Long userId, String username) {
+    public AuthResponse(boolean success, String message, Long userId, String fullName, String email) {
         this.success = success;
         this.message = message;
         this.userId = userId;
-        this.username = username;
+        this.fullName = fullName;
+        this.email = email;
     }
     
     public boolean isSuccess() {
@@ -44,11 +46,19 @@ public class AuthResponse {
         this.userId = userId;
     }
     
-    public String getUsername() {
-        return username;
+    public String getFullName() {
+        return fullName;
     }
     
-    public void setUsername(String username) {
-        this.username = username;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+    
+    public String getEmail() {
+        return email;
+    }
+    
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
