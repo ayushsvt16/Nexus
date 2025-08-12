@@ -103,7 +103,7 @@ const ExamVault = () => {
       };
       const semesterNum = romanToNum[selectedSemester] || 1;
       // Fetch filtered papers from backend
-      const papers = await examVaultAPI.getExamPapers(semesterNum, selectedBranch, selectedExamType);
+      const papers = await examVaultAPI.getExamPapers(semesterNum, selectedBranch, selectedExamType, selectedYear);
       // Only show PDFs
       const filtered = papers.filter(paper => paper.fileUrl && paper.fileUrl.toLowerCase().endsWith('.pdf'));
       setExamPapers(filtered);
@@ -332,7 +332,7 @@ const ExamVault = () => {
                       </button>
                       {showBranchDropdown && (
                         <div className="absolute left-0 right-0 z-10 bg-white border border-gray-200 rounded-md shadow-lg">
-                          {["CSE","ECE","ME","CE","EE"].map((branch) => (
+                          {["CSE","ECE","MAE","MNC"].map((branch) => (
                             <button
                               key={branch}
                               type="button"

@@ -45,7 +45,8 @@ public class ResourceController {
     @GetMapping
     public ResponseEntity<List<ExamResource>> fetch(@RequestParam(required = false) Integer semester,
                                                     @RequestParam(required = false) String branch,
-                                                    @RequestParam(required = false) String type) {
-        return ResponseEntity.ok(resourceService.fetchResources(semester, branch, type));
+                                                    @RequestParam(required = false) String type,
+                                                    @RequestParam(required = false) Integer year) {
+        return ResponseEntity.ok(resourceService.fetchResources(semester, branch, type, year));
     }
 }
