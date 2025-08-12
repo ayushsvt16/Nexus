@@ -135,19 +135,63 @@ public class ResourceService {
         }
     }
 
-    public List<ExamResource> fetchResources(Integer semester, String branch, String type) {
-        logger.debug("Fetching resources with semester: {}, branch: {}, type: {}", semester, branch, type);
+    public List<ExamResource> fetchResources(Integer semester, String branch, String type, Integer year) {
+        logger.debug("Fetching resources with semester: {}, branch: {}, type: {}, year: {}", semester, branch, type, year);
         
-        // Default values - same as before
-        int sem = (semester != null) ? semester : 1;
-        String br = (branch != null) ? branch : "CSE";
-        String tp = (type != null) ? type : "Mid Sem";
+        // If no filters are provided, return all resources
+        if (semester == null && branch == null && type == null && year == null) {
+            List<ExamResource> allResources = repository.findAll();
+            logger.info("Found {} total resources (no filters applied)", allResources.size());
+            return allResources;
+        }
         
-        List<ExamResource> resources = repository.findBySemesterAndBranchAndType(sem, br, tp);
-        logger.info("Found {} resources for semester: {}, branch: {}, type: {}", 
-                    resources.size(), sem, br, tp);
+        // Apply filters based on what parameters are provided
+        List<ExamResource> resources;
+        
+        if (semester != null && branch != null && type != null && year != null) {
+            // All four parameters provided - you'll need to add this method to repository
+            resources = repository.findBySemesterAndBranchAndTypeAndYear(semester, branch, type, year);
+            logger.info("Found {} resources for semester: {}, branch: {}, type: {}, year: {}", 
+                        resources.size(), semester, branch, type, year);
+        } else if (semester != null && branch != null && type != null) {
+            // Three parameters provided (existing method)
+            resources = repository.findBySemesterAndBranchAndType(semester, branch, type);
+            logger.info("Found {} resources for semester: {}, branch: {}, type: {}", 
+                        resources.size(), semester, branch, type);
+        } else if (year != null) {
+            // Only year filter provided
+            resources = repository.findByYear(year);
+            logger.info("Found {} resources for year: {}", resources.size(), year);
+        } else if (semester != null) {
+            // Only semester filter provided
+            resources = repository.findBySemester(semester);
+            logger.info("Found {} resources for semester: {}", resources.size(), semester);
+        } else if (branch != null) {
+            // Only branch filter provided
+            resources = repository.findByBranch(branch);
+            logger.info("Found {} resources for branch: {}", resources.size(), branch);
+        } else if (type != null) {
+            // Only type filter provided
+            resources = repository.findByType(type);
+            logger.info("Found {} resources for type: {}", resources.size(), type);
+        } else {
+            // Partial filtering combinations - for now, fall back to findAll()
+            // You can add more specific repository methods as needed
+            resources = repository.findAll();
+            logger.info("Found {} resources (partial filtering combination not implemented, returning all)", resources.size());
+        }
         
         return resources;
+    }
+    
+    /**
+     * Get all resources without any filtering
+     */
+    public List<ExamResource> getAllResources() {
+        logger.debug("Fetching all resources");
+        List<ExamResource> allResources = repository.findAll();
+        logger.info("Found {} total resources", allResources.size());
+        return allResources;
     }
     
     // Additional utility methods you might want to add
