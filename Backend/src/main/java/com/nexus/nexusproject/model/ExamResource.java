@@ -22,7 +22,7 @@ public class ExamResource {
     private String professorName;
 
     @Column(name = "exam_type")
-    private String type;          // "Mid Sem" or "End Sem"
+    private String type;        // "Mid Sem" or "End Sem"
 
     private Integer semester;     // 1-8
     private Integer year;         // e.g., 2023

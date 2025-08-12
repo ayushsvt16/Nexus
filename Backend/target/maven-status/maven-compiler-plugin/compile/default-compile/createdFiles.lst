@@ -1,3 +1,14 @@
 com\nexus\nexusproject\NexusprojectApplication.class
+com\nexus\nexusproject\DTO\ResourceResponse.class
+com\nexus\nexusproject\model\ExamResource.class
+com\nexus\nexusproject\DTO\LoginRequest.class
+com\nexus\nexusproject\model\User.class
+com\nexus\nexusproject\Controller\AuthController.class
+com\nexus\nexusproject\Service\ResourceService.class
+com\nexus\nexusproject\Config\ImageKitConfig.class
+com\nexus\nexusproject\Repository\ExamResourceRepository.class
+com\nexus\nexusproject\DTO\AuthResponse.class
+com\nexus\nexusproject\Controller\ResourceController.class
 com\nexus\nexusproject\Repository\UserRepository.class
 com\nexus\nexusproject\Service\UserService.class
+com\nexus\nexusproject\DTO\SignUpRequest.class
