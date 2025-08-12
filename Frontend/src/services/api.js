@@ -52,10 +52,10 @@ export const authAPI = {
 
 export const examVaultAPI = {
   // Get all exam papers with filters
-  getExamPapers: async (semester, branch, year) => {
+  getExamPapers: async (semester, branch, type) => {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/exam-papers?semester=${semester}&branch=${branch}&year=${year}`
+        `${API_BASE_URL}/resources?semester=${semester}&branch=${branch}&type=${type}`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch exam papers');

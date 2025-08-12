@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import examVaultAPI from '../services/api';
 import { useDropzone } from 'react-dropzone';
 
 // Efficient drag-and-drop file upload using react-dropzone
@@ -92,83 +93,23 @@ const ExamVault = () => {
     };
   }, [showSemesterDropdown, showYearDropdown, showBranchDropdown, showTypeDropdown]);
 
-  // Mock data for demonstration
-  const mockPapers = [
-    {
-      id: 1,
-      courseCode: 'CS201',
-      courseName: 'Discrete Mathematics',
-      professor: 'Dr. Himadri Nayak',
-      semester: 'I',
-      branch: 'CSE',
-      year: '2023',
-      examType: 'Mid Sem',
-      fileUrl: '/path/to/pdf'
-    },
-    {
-      id: 2,
-      courseCode: 'CS202',
-      courseName: 'Data Structures',
-      professor: 'Dr. Anita Sharma',
-      semester: 'I',
-      branch: 'CSE',
-      year: '2023',
-      examType: 'End Sem',
-      fileUrl: '/path/to/pdf'
-    },
-    {
-      id: 4,
-      courseCode: 'EC201',
-      courseName: 'Circuit Analysis',
-      professor: 'Dr. Priya Singh',
-      semester: 'I',
-      branch: 'ECE',
-      year: '2023',
-      examType: 'Mid Sem',
-      fileUrl: '/path/to/pdf'
-    },
-    {
-      id: 5,
-      courseCode: 'ME201',
-      courseName: 'Engineering Mechanics',
-      professor: 'Dr. Suresh Patel',
-      semester: 'I',
-      branch: 'MAE',
-      year: '2023',
-      examType: 'End Sem',
-      fileUrl: '/path/to/pdf'
-    },
-    // Add papers for different semesters/branches
-    {
-      id: 6,
-      courseCode: 'CS301',
-      courseName: 'Database Systems',
-      professor: 'Dr. Neha Gupta',
-      semester: 'II',
-      branch: 'CSE',
-      year: '2023',
-      examType: 'Mid Sem',
-      fileUrl: '/path/to/pdf'
-    }
-  ];
-
-  // Fetch exam papers based on selection (using mock data)
+  // Fetch exam papers from backend
   const fetchExamPapers = async () => {
     setLoading(true);
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Filter mock data based on selection
-      const filteredPapers = mockPapers.filter(paper => 
-        paper.semester === selectedSemester && 
-        paper.branch === selectedBranch && 
-        paper.year === selectedYear &&
-        paper.examType === selectedExamType
-      );
-      setExamPapers(filteredPapers);
+      // Convert semester to number for backend
+      const romanToNum = {
+        'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7, 'VIII': 8
+      };
+      const semesterNum = romanToNum[selectedSemester] || 1;
+      // Fetch filtered papers from backend
+      const papers = await examVaultAPI.getExamPapers(semesterNum, selectedBranch, selectedExamType);
+      // Only show PDFs
+      const filtered = papers.filter(paper => paper.fileUrl && paper.fileUrl.toLowerCase().endsWith('.pdf'));
+      setExamPapers(filtered);
     } catch (error) {
       console.error('Error fetching exam papers:', error);
+      setExamPapers([]);
     } finally {
       setLoading(false);
     }
@@ -176,6 +117,7 @@ const ExamVault = () => {
 
   useEffect(() => {
     fetchExamPapers();
+    // eslint-disable-next-line
   }, [selectedSemester, selectedBranch, selectedYear, selectedExamType]);
 
   const semesters = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
@@ -184,33 +126,25 @@ const ExamVault = () => {
   const examTypes = ['Mid Sem', 'End Sem'];
 
   const PaperCard = ({ paper }) => {
-    const handleDownload = () => {
-      // Simulate download - in real app, this would download the actual file
-      alert(`Downloading ${paper.courseCode} - ${paper.courseName}`);
-      // In a real app, you would use:
-      // window.open(paper.fileUrl, '_blank');
-    };
-
     return (
-      <div 
-        className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-3 md:p-4 hover:shadow-lg transition-all duration-300 cursor-pointer hover:from-red-100 hover:to-red-200 border-2 border-red-300 hover:border-red-400 
-                   flex sm:flex-row md:flex-col items-center md:justify-center gap-3 md:gap-0"
-        onClick={handleDownload}
+      <a
+        href={paper.fileUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-3 md:p-4 hover:shadow-lg transition-all duration-300 cursor-pointer hover:from-red-100 hover:to-red-200 border-2 border-red-300 hover:border-red-400 flex flex-col items-center justify-center gap-2"
       >
-        <div className="w-12 h-12 md:w-16 md:h-16 flex-shrink-0 md:mb-2 md:mb-3 bg-red-200 rounded-full flex items-center justify-center">
+        <div className="w-12 h-12 md:w-16 md:h-16 flex-shrink-0 mb-2 bg-red-200 rounded-full flex items-center justify-center">
           {/* PDF Icon */}
           <svg className="w-6 h-6 md:w-8 md:h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
           </svg>
         </div>
-        <div className="flex-1 md:text-center">
-          <div className="flex items-center gap-2 mb-1 justify-start md:justify-center">
-            <h3 className="font-bold text-sm md:text-base text-gray-800">{paper.courseCode}</h3>
-          </div>
-          <p className="text-xs md:text-sm text-gray-700 text-left md:text-center line-clamp-2 font-medium">{paper.courseName}</p>
-          <p className="text-xs text-red-600 text-left md:text-center truncate font-medium mt-1">{paper.professor}</p>
+        <div className="flex flex-col items-center justify-center w-full">
+          <div className="font-bold text-base text-gray-800 mb-1 text-center">{paper.subjectCode}</div>
+          <div className="text-sm text-gray-700 font-medium text-center mb-1">{paper.subjectName}</div>
+          <div className="text-xs text-red-600 font-medium text-center">{paper.professorName}</div>
         </div>
-      </div>
+      </a>
     );
   };
 
@@ -365,7 +299,7 @@ const ExamVault = () => {
                       </button>
                       {showYearDropdown && (
                         <div className="absolute left-0 right-0 z-10 bg-white border border-gray-200 rounded-md shadow-lg">
-                          {["2021","2022","2023","2024"].map((year) => (
+                          {["2023","2024","2025"].map((year) => (
                             <button
                               key={year}
                               type="button"
@@ -426,13 +360,40 @@ const ExamVault = () => {
                 <button
                   type="button"
                   className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium mt-2 transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
-                  onClick={() => {
+                  onClick={async () => {
                     if (!uploadFile) {
                       alert('Please upload a PDF file.');
                       return;
                     }
-                    alert('Resource uploaded (mock)!');
-                    setShowUploadForm(false);
+                    // Convert semester to number
+                    const romanToNum = {
+                      'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7, 'VIII': 8
+                    };
+                    const semesterNum = romanToNum[uploadForm.semester] || 1;
+                    const yearNum = parseInt(uploadForm.year) || 2023;
+                    const formData = new FormData();
+                    formData.append('subjectCode', uploadForm.subjectCode);
+                    formData.append('subjectName', uploadForm.subjectName);
+                    formData.append('professorName', uploadForm.professorName);
+                    formData.append('type', uploadForm.type);
+                    formData.append('semester', semesterNum);
+                    formData.append('year', yearNum);
+                    formData.append('branch', uploadForm.branch);
+                    formData.append('file', uploadFile);
+                    try {
+                      const response = await fetch('http://localhost:8080/api/resources/upload', {
+                        method: 'POST',
+                        body: formData
+                      });
+                      if (!response.ok) {
+                        throw new Error('Failed to upload resource');
+                      }
+                      alert('Resource uploaded successfully!');
+                      setShowUploadForm(false);
+                      fetchExamPapers();
+                    } catch (err) {
+                      alert('Error uploading resource: ' + err.message);
+                    }
                   }}
                 >
                   Upload
@@ -542,18 +503,6 @@ const ExamVault = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4">
             {examPapers.map((paper) => (
               <PaperCard key={paper.id} paper={paper} />
-            ))}
-            {/* Add more mock papers for demonstration */}
-            {Array.from({ length: 6 }).map((_, index) => (
-              <PaperCard 
-                key={`mock-${index}`} 
-                paper={{
-                  id: `mock-${index}`,
-                  courseCode: 'CS201',
-                  courseName: 'Discrete Mathematics',
-                  professor: 'Dr. Himadri Nayak'
-                }} 
-              />
             ))}
           </div>
         )}
