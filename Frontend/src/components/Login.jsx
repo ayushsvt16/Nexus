@@ -3,11 +3,12 @@ import { authAPI } from '../services/api'; // ✅ Added import
 
 const Login = ({ onLogin, onClose }) => {
   const [formData, setFormData] = useState({
-    name: '',
+    fullName: '',
     email: '',
     password: ''
   });
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -24,15 +25,21 @@ const Login = ({ onLogin, onClose }) => {
       .substring(0, 2);
   };
 
-  // ✅ Replaced handleSubmit function to connect with backend
+  // ✅ Updated handleSubmit function to use email-based authentication
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       if (isSignUp) {
+        // Client-side validation for email domain
+        if (!formData.email.endsWith('@iiitbh.ac.in')) {
+          alert('Please use your IIIT Bhilai email address (@iiitbh.ac.in)');
+          return;
+        }
+
         // Sign up with backend
         const signupData = {
-          username: formData.name, // Using "name" as username
+          fullName: formData.fullName,
           email: formData.email,
           password: formData.password
         };
@@ -42,8 +49,9 @@ const Login = ({ onLogin, onClose }) => {
         if (response.success) {
           const userData = {
             id: response.userId,
-            name: response.username,
-            initials: generateInitials(response.username)
+            name: response.fullName,
+            email: response.email,
+            initials: generateInitials(response.fullName)
           };
           onLogin(userData);
         } else {
@@ -52,7 +60,7 @@ const Login = ({ onLogin, onClose }) => {
       } else {
         // Login with backend
         const loginData = {
-          username: formData.name, // Using "name" as username
+          email: formData.email,
           password: formData.password
         };
 
@@ -61,8 +69,9 @@ const Login = ({ onLogin, onClose }) => {
         if (response.success) {
           const userData = {
             id: response.userId,
-            name: response.username,
-            initials: generateInitials(response.username)
+            name: response.fullName,
+            email: response.email,
+            initials: generateInitials(response.fullName)
           };
           onLogin(userData);
         } else {
@@ -90,45 +99,54 @@ const Login = ({ onLogin, onClose }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Full Name</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-              placeholder="Enter your full name"
-              required
-            />
-          </div>
-
           {isSignUp && (
             <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
+              <label className="block text-sm font-medium mb-1">Full Name</label>
               <input
-                type="email"
-                name="email"
-                value={formData.email}
+                type="text"
+                name="fullName"
+                value={formData.fullName}
                 onChange={handleChange}
                 className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                placeholder="Enter your email"
+                placeholder="Enter your full name"
                 required
               />
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
+            <label className="block text-sm font-medium mb-1">Email</label>
             <input
-              type="password"
-              name="password"
-              value={formData.password}
+              type="email"
+              name="email"
+              value={formData.email}
               onChange={handleChange}
               className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-              placeholder="Enter your password"
+              placeholder={isSignUp ? "Enter your IIIT Bhilai email (@iiitbh.ac.in)" : "Enter your email"}
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 pr-10"
+                placeholder="Enter your password"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
           </div>
 
           <button
