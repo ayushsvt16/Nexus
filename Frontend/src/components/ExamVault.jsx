@@ -5,37 +5,51 @@ import { useDropzone } from 'react-dropzone';
 // Efficient drag-and-drop file upload using react-dropzone
 function FileDropZone({ onFileAccepted }) {
   const { getRootProps, getInputProps, acceptedFiles, isDragActive } = useDropzone({
-    accept: {
-      'application/pdf': []
-    },
+    accept: { 'application/pdf': [] },
     maxFiles: 1,
     onDrop: (files) => {
-      if (files && files[0]) {
-        onFileAccepted(files[0]);
-      }
+      if (files && files[0]) onFileAccepted(files[0]);
     }
   });
+
+  const file = acceptedFiles[0];
 
   return (
     <div
       {...getRootProps()}
-      className={`border-2 border-dashed rounded-lg px-4 py-6 flex flex-col items-center justify-center transition-all duration-200 cursor-pointer ${isDragActive ? 'border-pink-500 bg-pink-50' : 'border-orange-300 bg-orange-10'}`}
-      style={{ minHeight: '80px' }}
+      className={`group relative w-full rounded-xl border border-dashed bg-white/60 px-4 py-6 md:py-7 text-center transition-all duration-200 cursor-pointer select-none backdrop-blur-sm
+        ${isDragActive ? 'border-orange-400 ring-2 ring-orange-300/40 bg-orange-50/70' : 'border-gray-300 hover:border-gray-400 hover:bg-white'}
+      `}
+      style={{ minHeight: '88px' }}
+      aria-label="Upload PDF via drag & drop or click"
     >
       <input {...getInputProps()} />
-      {acceptedFiles.length > 0 ? (
-        <div className="flex flex-col items-center">
-          <span className="text-sm font-medium text-orange-700">{acceptedFiles[0].name}</span>
-          <span className="text-xs text-gray-500">{(acceptedFiles[0].size / 1024).toFixed(1)} KB</span>
+      {file ? (
+        <div className="flex items-center justify-center gap-3">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-red-100 text-red-600">
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 3h6l5 5v11a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z" />
+              <path d="M13 3v5h5" />
+              <text x="9" y="16" fontSize="6" fill="currentColor" fontFamily="ui-sans-serif,system-ui">PDF</text>
+            </svg>
+          </span>
+          <div className="text-left">
+            <div className="text-sm font-medium text-gray-800 truncate max-w-[14rem] md:max-w-[18rem]">{file.name}</div>
+            <div className="text-xs text-gray-500">{(file.size / (file.size > 900000 ? 1048576 : 1024)).toFixed(1)} {file.size > 900000 ? 'MB' : 'KB'}</div>
+          </div>
+          <span className="ml-2 hidden text-xs text-gray-400 md:inline">Click to replace</span>
         </div>
       ) : (
-        <>
-          <svg className="w-8 h-8 text-orange-400 mb-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-8m0 0l-4 4m4-4l4 4" />
-            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
-          </svg>
-          <span className="text-xs text-orange-700">Drag & drop PDF here or <span className="underline text-pink-500">choose file</span></span>
-        </>
+        <div className="flex flex-col items-center justify-center">
+          <span className={`mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-orange-50 text-orange-500 transition-colors ${isDragActive ? 'bg-orange-100 text-orange-600' : ''}`}>
+            <img src="/upload-icon.svg" alt="Upload" className="h-5 w-5" />
+          </span>
+          <p className="text-sm font-medium text-gray-800">Upload PDF</p>
+          <p className="mt-1 text-xs text-gray-500">
+            Drag and drop or <span className="text-orange-600 underline decoration-orange-300 underline-offset-2">browse</span>
+          </p>
+          <p className="mt-1 text-[10px] text-gray-400">Only .pdf, max 1 file</p>
+        </div>
       )}
     </div>
   );
@@ -190,7 +204,7 @@ const ExamVault = () => {
                     <label className="block text-xs font-medium text-gray-600 mb-1">Subject Code</label>
                     <input
                       type="text"
-                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 min-w-0 mb-2"
+                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 min-w-0 mb-2 transition-colors duration-150 hover:border-orange-300 hover:bg-orange-50/30 hover:shadow-sm"
                       value={uploadForm.subjectCode}
                       onChange={e => setUploadForm({ ...uploadForm, subjectCode: e.target.value })}
                     />
@@ -199,7 +213,7 @@ const ExamVault = () => {
                     <label className="block text-xs font-medium text-gray-600 mb-1">Subject Name</label>
                     <input
                       type="text"
-                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 min-w-0 mb-2"
+                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 min-w-0 mb-2 transition-colors duration-150 hover:border-orange-300 hover:bg-orange-50/30 hover:shadow-sm"
                       value={uploadForm.subjectName}
                       onChange={e => setUploadForm({ ...uploadForm, subjectName: e.target.value })}
                     />
@@ -210,7 +224,7 @@ const ExamVault = () => {
                     <label className="block text-xs font-medium text-gray-600 mb-1">Professor Name</label>
                     <input
                       type="text"
-                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 min-w-0 mb-2"
+                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 min-w-0 mb-2 transition-colors duration-150 hover:border-orange-300 hover:bg-orange-50/30 hover:shadow-sm"
                       value={uploadForm.professorName}
                       onChange={e => setUploadForm({ ...uploadForm, professorName: e.target.value })}
                     />
@@ -220,7 +234,7 @@ const ExamVault = () => {
                     <div className="relative" ref={typeDropdownRef}>
                       <button
                         type="button"
-                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2"
+                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2 transition-colors duration-150 hover:border-orange-300 hover:bg-orange-50/30"
                         onClick={() => setShowTypeDropdown((prev) => !prev)}
                         tabIndex={0}
                       >
@@ -255,7 +269,7 @@ const ExamVault = () => {
                     <div className="relative" ref={semesterDropdownRef}>
                       <button
                         type="button"
-                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2"
+                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2 transition-colors duration-150 hover:border-orange-300 hover:bg-orange-50/30"
                         onClick={() => setShowSemesterDropdown((prev) => !prev)}
                         tabIndex={0}
                       >
@@ -288,7 +302,7 @@ const ExamVault = () => {
                     <div className="relative" ref={yearDropdownRef}>
                       <button
                         type="button"
-                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2"
+                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2 transition-colors duration-150 hover:border-orange-300 hover:bg-orange-50/30"
                         onClick={() => setShowYearDropdown((prev) => !prev)}
                         tabIndex={0}
                       >
@@ -321,7 +335,7 @@ const ExamVault = () => {
                     <div className="relative" ref={branchDropdownRef}>
                       <button
                         type="button"
-                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2"
+                        className="w-full flex items-center justify-between rounded-md border border-gray-200 px-3 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-2 transition-colors duration-150 hover:border-orange-300 hover:bg-orange-50/30"
                         onClick={() => setShowBranchDropdown((prev) => !prev)}
                         tabIndex={0}
                       >
@@ -480,17 +494,39 @@ const ExamVault = () => {
             <span><strong>Branch:</strong> {selectedBranch}</span>
             <span><strong>Exam Type:</strong> {selectedExamType}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 relative" style={{ minWidth: '120px' }}>
             <span className="text-sm"><strong>Year:</strong></span>
-            <select 
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-1 text-sm "
-            >
-              {years.map((year) => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
+            <div className="relative" ref={yearDropdownRef}>
+              <button
+                type="button"
+                className="w-full flex items-center justify-between rounded-md border border-gray-500 px-3 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 mb-0 min-w-[80px]"
+                onClick={() => setShowYearDropdown((prev) => !prev)}
+                tabIndex={0}
+                style={{ minWidth: '80px' }}
+              >
+                <span>{selectedYear}</span>
+                <span className="flex items-center justify-center h-full">
+                  <img src="/down.svg" alt="Dropdown arrow" className="w-2 h-2 text-gray-200" />
+                </span>
+              </button>
+              {showYearDropdown && (
+                <div className="absolute left-0 right-0 mt-1 z-10 bg-white border border-gray-200 rounded-md shadow-lg">
+                  {years.map((year) => (
+                    <button
+                      key={year}
+                      type="button"
+                      className={`w-full text-left px-3 text-sm hover:bg-orange-100 rounded-md transition-colors ${selectedYear === year ? "bg-orange-50 font-semibold text-orange-700" : "text-gray-700"}`}
+                      onClick={() => {
+                        setSelectedYear(year);
+                        setShowYearDropdown(false);
+                      }}
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
