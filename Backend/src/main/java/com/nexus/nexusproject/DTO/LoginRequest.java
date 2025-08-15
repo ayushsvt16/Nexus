@@ -1,12 +1,17 @@
 package com.nexus.nexusproject.DTO;
+// path to the directory
+
+// receive login data from the frontend
 
 public class LoginRequest {
     private String email;
     private String password;
-    
+
     public LoginRequest() {}
-    
-    public LoginRequest(String email, String password) {
+    // default constructor needed because
+    // so Spring can automatically create an empty LoginRequest object and then set values from the request body.
+
+    public LoginRequest(String email, String password) { // store login data
         this.email = email;
         this.password = password;
     }

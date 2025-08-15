@@ -1,4 +1,6 @@
-package com.nexus.nexusproject.DTO;
+package com.nexus.nexusproject.DTO; // path of the directory
+
+// package you send back to the frontend when someone requests a resource
 
 public class ResourceResponse {
     private Long id;

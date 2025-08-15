@@ -1,20 +1,21 @@
-package com.nexus.nexusproject.DTO;
+package com.nexus.nexusproject.DTO; // path of the directory
 
 public class AuthResponse {
-    private boolean success;
-    private String message;
+    private boolean success; // indicates if the authentication was successful
+    private String message;// message to return to the client, e.g., error messages or success confirmation
     private Long userId;
     private String fullName;
     private String email;
-    
-    public AuthResponse() {}
-    
+
+    public AuthResponse() {}// used for deserialization
+
     public AuthResponse(boolean success, String message) {
         this.success = success;
         this.message = message;
     }
-    
-    public AuthResponse(boolean success, String message, Long userId, String fullName, String email) {
+    // response ki process successfull thi ki nahi with message
+    public AuthResponse(boolean success, String message, Long userId, String fullName, String email) { 
+        // constructor for successful authentication
         this.success = success;
         this.message = message;
         this.userId = userId;
