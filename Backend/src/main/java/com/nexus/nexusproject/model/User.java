@@ -1,4 +1,5 @@
 package com.nexus.nexusproject.model;
+// path of the directory
 
 import java.time.LocalDateTime;
 
@@ -9,8 +10,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity
-@Table(name = "users")
+@Entity // table banani hai
+@Table(name = "users") // name of the table
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

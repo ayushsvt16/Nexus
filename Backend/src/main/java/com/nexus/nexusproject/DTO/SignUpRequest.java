@@ -1,4 +1,5 @@
 package com.nexus.nexusproject.DTO;
+// path of the directory
 
 public class SignUpRequest {
     private String fullName;
@@ -6,6 +7,7 @@ public class SignUpRequest {
     private String password;
     
     public SignUpRequest() {}
+    // Used when an empty SignUpRequest object is created and values are set later using setters.
     
     public SignUpRequest(String fullName, String email, String password) {
         this.fullName = fullName;

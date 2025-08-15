@@ -1,4 +1,4 @@
-package com.nexus.nexusproject.model;
+package com.nexus.nexusproject.model;// path of the directory
 
 import java.time.LocalDateTime;
 
@@ -8,13 +8,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "exam_resources")
+// this code is a blueprint for your db table
+@Entity // tells spring boot to create a table for this class
+@Table(name = "exam_resources") // table name 
 public class ExamResource {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id  // unique identifier for each resource
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-incremented ID
     private Long id;
 
     private String subjectCode;
@@ -28,7 +28,7 @@ public class ExamResource {
     private Integer year;         // e.g., 2023
     private String branch;        // CSE, ECE, etc.
 
-    private String fileUrl;       // Cloudinary secure URL
+    private String fileUrl;       // ImageKit.io secure URL
 
     private LocalDateTime uploadedAt = LocalDateTime.now();
 
