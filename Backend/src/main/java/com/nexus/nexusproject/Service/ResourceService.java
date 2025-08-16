@@ -1,4 +1,5 @@
 package com.nexus.nexusproject.Service;
+// path of the directory
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,18 +19,26 @@ import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.models.FileCreateRequest;
 import io.imagekit.sdk.models.results.Result;
 
-@Service
+@Service // tells that it this class will have resource-related business logic
 public class ResourceService {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourceService.class);
-    
-    private final ImageKit imageKit;
-    private final ExamResourceRepository repository;
+    // creating a logger for resource service class
+    // logger for logging events in ResourceService
+    // logger is an object to print messages 
+    // logger is used to track what's happening in code when running mtb  info , warning , error , debug etc
+    // logger file is used to create logger object 
+    private final ImageKit imageKit; // bean ban gyi
+    private final ExamResourceRepository repository; // bean bn gyi 
 
     public ResourceService(ImageKit imageKit, ExamResourceRepository repository) {
         this.imageKit = imageKit;
         this.repository = repository;
     }
+
+    // till here 
+    // imagekit is ready to upload files to the cloud
+    // repository is ready to save or fetch exam resources from postgree sql
 
     public ExamResource uploadResource(MultipartFile file,
                                      String subjectCode,
