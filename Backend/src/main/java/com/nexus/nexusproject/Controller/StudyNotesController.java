@@ -48,7 +48,7 @@ public ResponseEntity<?> uploadNote(
         }
 
         StudyNoteResponse uploadedNote =
-                studyNoteService.uploadNote(file, semester, subjectCode, branch, batchYear);
+                //studyNoteService.uploadNote(file, semester, subjectCode, branch, batchYear);
 
         return ResponseEntity.ok(uploadedNote);
 
