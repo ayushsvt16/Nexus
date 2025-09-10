@@ -73,7 +73,7 @@ public class ResourceService {
             }
             if (branch != null && !branch.trim().isEmpty()) {
                 tags.add(branch.trim().toLowerCase());
-            }
+            } 
             if (type != null && !type.trim().isEmpty()) {
                 tags.add(type.replace(" ", "_").toLowerCase());
             }
