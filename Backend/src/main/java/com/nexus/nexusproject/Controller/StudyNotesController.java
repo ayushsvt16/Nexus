@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-@RestController
+@RestController // controller + response body
 @RequestMapping("/api/auth/notes")
 @CrossOrigin(origins = "*")
 public class StudyNotesController {
@@ -48,7 +48,7 @@ public ResponseEntity<?> uploadNote(
         }
 
         StudyNoteResponse uploadedNote =
-                //studyNoteService.uploadNote(file, semester, subjectCode, branch, batchYear);
+                studyNoteService.uploadNote(file, semester, subjectCode, branch, batchYear);
 
         return ResponseEntity.ok(uploadedNote);
 
