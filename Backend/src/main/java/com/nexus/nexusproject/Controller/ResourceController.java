@@ -38,14 +38,15 @@ public class ResourceController {
                                     @RequestParam Integer semester, // 1-8
                                     @RequestParam Integer year,
                                     @RequestParam String branch) {
-        try {
+      //  try {
             // resource service ye sab data ko store krta hai cloud service or somewhere
             //exam resource ek entity hai jo ek exam paper store hogya system me 
-            ExamResource saved = resourceService.uploadResource(file, subjectCode, subjectName, professorName, type, semester, year, branch);
-            return ResponseEntity.ok(saved);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Upload failed: " + e.getMessage());
-        }
+            // ExamResource saved = resourceService.uploadResource(file, subjectCode, subjectName, professorName, type, semester, year, branch);
+            // return ResponseEntity.ok(saved);
+            return ResponseEntity.ok(ExamResource.builder().subjectCode(subjectCode).subjectName(subjectName).professorName(professorName).type(type).semester(semester).year(year).branch(branch).build());
+      //  } catch (IOException e) {
+          //  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Upload failed: " + e.getMessage());
+      //  }
     }
 
     @GetMapping // fetch resources based on query parameters

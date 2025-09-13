@@ -2,10 +2,8 @@ package com.nexus.nexusproject.Repository;
 // path of the directory
 
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import com.nexus.nexusproject.model.ExamResource;
 
 @Repository //ye batata hai ki spring data jpa ka repository hai
@@ -17,4 +15,5 @@ public interface ExamResourceRepository extends JpaRepository<ExamResource, Long
     List<ExamResource> findBySemester(Integer semester);
     List<ExamResource> findByBranch(String branch);
     List<ExamResource> findByType(String type);
+    ExamResource save(ExamResource resources);
 }

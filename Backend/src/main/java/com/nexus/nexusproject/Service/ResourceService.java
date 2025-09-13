@@ -2,24 +2,36 @@ package com.nexus.nexusproject.Service;
 // path of the directory
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.nexus.nexusproject.DTO.S3UploadResult;
+import com.nexus.nexusproject.DTO.UploadResourceRequest;
+import com.nexus.nexusproject.DTO.UploadResourceResponse;
 import com.nexus.nexusproject.Repository.ExamResourceRepository;
+import com.nexus.nexusproject.constants.S3Constants;
 import com.nexus.nexusproject.model.ExamResource;
 
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.models.FileCreateRequest;
 import io.imagekit.sdk.models.results.Result;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Service // tells that it this class will have resource-related business logic
+@RequiredArgsConstructor
+@Log4j2
 public class ResourceService {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourceService.class);
@@ -28,121 +40,123 @@ public class ResourceService {
     // logger is an object to print messages 
     // logger is used to track what's happening in code when running mtb  info , warning , error , debug etc
     // logger file is used to create logger object 
-    private final ImageKit imageKit; // bean ban gyi
-    private final ExamResourceRepository repository; // bean bn gyi 
 
-    public ResourceService(ImageKit imageKit, ExamResourceRepository repository) {
-        this.imageKit = imageKit;
-        this.repository = repository;
-    }
-
+    @Autowired
+    private  ImageKit imageKit; // bean ban gyi
+     
+    @Autowired
+    private  ExamResourceRepository repository; // bean bn gyi 
+    
+    @Autowired
+    private S3service s3Service;
+    
     // till here 
     // imagekit is ready to upload files to the cloud
     // repository is ready to save or fetch exam resources from postgree sql
 
-    public ExamResource uploadResource(MultipartFile file,
-                                     String subjectCode,
-                                     String subjectName,
-                                     String professorName,
-                                     String type,
-                                     Integer semester,
-                                     Integer year,
-                                     String branch) throws IOException {
+    // public ExamResource uploadResource(MultipartFile file,
+    //                                  String subjectCode,
+    //                                  String subjectName,
+    //                                  String professorName,
+    //                                  String type,
+    //                                  Integer semester,
+    //                                  Integer year,
+    //                                  String branch) throws IOException {
 
-        logger.info("Starting file upload to ImageKit: {}", file.getOriginalFilename());
+    //     logger.info("Starting file upload to ImageKit: {}", file.getOriginalFilename());
         
-        try {
-            // Validate file
-            if (file.isEmpty()) {
-                throw new IOException("File is empty");
-            }
+    //     try {
+    //         // Validate file
+    //         if (file.isEmpty()) {
+    //             throw new IOException("File is empty");
+    //         }
 
-            // Create file upload request for ImageKit
-            FileCreateRequest fileCreateRequest = new FileCreateRequest(
-                    file.getBytes(), 
-                    file.getOriginalFilename()
-            );
-            // Set folder for organization (similar to Cloudinary folders)
-            fileCreateRequest.setFolder("exam-vault");
-            // Set use unique filename to avoid conflicts
-            fileCreateRequest.setUseUniqueFileName(true);
-            // Set tags for better organization and searchability
-            List<String> tags = new ArrayList<>();
-            if (subjectCode != null && !subjectCode.trim().isEmpty()) {
-                tags.add(subjectCode.trim().toLowerCase());
-            }
-            if (branch != null && !branch.trim().isEmpty()) {
-                tags.add(branch.trim().toLowerCase());
-            } 
-            if (type != null && !type.trim().isEmpty()) {
-                tags.add(type.replace(" ", "_").toLowerCase());
-            }
-            tags.add("semester_" + (semester != null ? semester : 1));
-            tags.add("year_" + (year != null ? year : 2023));
-            if (!tags.isEmpty()) {
-                fileCreateRequest.setTags(tags);
-            }
-            // Set response fields to get additional metadata
-            List<String> responseFields = new ArrayList<>();
-            responseFields.add("fileId");
-            responseFields.add("url");
-            responseFields.add("thumbnail");
-            responseFields.add("size");
-            responseFields.add("fileType");
-            fileCreateRequest.setResponseFields(responseFields);
-            logger.debug("Uploading file with tags: {}", tags);
-            // Upload to ImageKit
-            Result result = null;
-            try {
-                result = imageKit.upload(fileCreateRequest);
-            } catch (io.imagekit.sdk.exceptions.InternalServerException |
-                     io.imagekit.sdk.exceptions.BadRequestException |
-                     io.imagekit.sdk.exceptions.UnknownException |
-                     io.imagekit.sdk.exceptions.ForbiddenException |
-                     io.imagekit.sdk.exceptions.TooManyRequestsException |
-                     io.imagekit.sdk.exceptions.UnauthorizedException ex) {
-                logger.error("ImageKit upload failed due to SDK exception", ex);
-                throw new IOException("ImageKit SDK error: " + ex.getMessage(), ex);
-            }
-            if (result == null || result.getFileId() == null || result.getFileId().isEmpty()) {
-                logger.error("ImageKit upload failed. No fileId returned.");
-                throw new IOException("ImageKit upload failed. No fileId returned.");
-            }
-            logger.info("File uploaded successfully to ImageKit. File ID: {}", result.getFileId());
-            String fileUrl = result.getUrl();
+    //         // Create file upload request for ImageKit
+    //         FileCreateRequest fileCreateRequest = new FileCreateRequest(
+    //                 file.getBytes(), 
+    //                 file.getOriginalFilename()
+    //         );
+    //         // Set folder for organization (similar to Cloudinary folders)
+    //         fileCreateRequest.setFolder("exam-vault");
+    //         // Set use unique filename to avoid conflicts
+    //         fileCreateRequest.setUseUniqueFileName(true);
+    //         // Set tags for better organization and searchability
+    //         List<String> tags = new ArrayList<>();
+    //         if (subjectCode != null && !subjectCode.trim().isEmpty()) {
+    //             tags.add(subjectCode.trim().toLowerCase());
+    //         }
+    //         if (branch != null && !branch.trim().isEmpty()) {
+    //             tags.add(branch.trim().toLowerCase());
+    //         } 
+    //         if (type != null && !type.trim().isEmpty()) {
+    //             tags.add(type.replace(" ", "_").toLowerCase());
+    //         }
+    //         tags.add("semester_" + (semester != null ? semester : 1));
+    //         tags.add("year_" + (year != null ? year : 2023));
+    //         if (!tags.isEmpty()) {
+    //             fileCreateRequest.setTags(tags);
+    //         }
+    //         // Set response fields to get additional metadata
+    //         List<String> responseFields = new ArrayList<>();
+    //         responseFields.add("fileId");
+    //         responseFields.add("url");
+    //         responseFields.add("thumbnail");
+    //         responseFields.add("size");
+    //         responseFields.add("fileType");
+    //         fileCreateRequest.setResponseFields(responseFields);
+    //         logger.debug("Uploading file with tags: {}", tags);
+    //         // Upload to ImageKit
+    //         Result result = null;
+    //         try {
+    //             result = imageKit.upload(fileCreateRequest);
+    //         } catch (io.imagekit.sdk.exceptions.InternalServerException |
+    //                  io.imagekit.sdk.exceptions.BadRequestException |
+    //                  io.imagekit.sdk.exceptions.UnknownException |
+    //                  io.imagekit.sdk.exceptions.ForbiddenException |
+    //                  io.imagekit.sdk.exceptions.TooManyRequestsException |
+    //                  io.imagekit.sdk.exceptions.UnauthorizedException ex) {
+    //             logger.error("ImageKit upload failed due to SDK exception", ex);
+    //             throw new IOException("ImageKit SDK error: " + ex.getMessage(), ex);
+    //         }
+    //         if (result == null || result.getFileId() == null || result.getFileId().isEmpty()) {
+    //             logger.error("ImageKit upload failed. No fileId returned.");
+    //             throw new IOException("ImageKit upload failed. No fileId returned.");
+    //         }
+    //         logger.info("File uploaded successfully to ImageKit. File ID: {}", result.getFileId());
+    //         String fileUrl = result.getUrl();
 
-            // Save metadata to Postgres
-            ExamResource resource = new ExamResource();
-            resource.setSubjectCode(subjectCode != null ? subjectCode.trim() : null);
-            resource.setSubjectName(subjectName != null ? subjectName.trim() : null);
-            resource.setProfessorName(professorName != null ? professorName.trim() : null);
-            resource.setType(type);
-            resource.setSemester(semester);
-            resource.setYear(year);
-            resource.setBranch(branch);
-            resource.setFileUrl(fileUrl);
+    //         // Save metadata to Postgres
+    //         ExamResource resource = new ExamResource();
+    //         resource.setSubjectCode(subjectCode != null ? subjectCode.trim() : null);
+    //         resource.setSubjectName(subjectName != null ? subjectName.trim() : null);
+    //         resource.setProfessorName(professorName != null ? professorName.trim() : null);
+    //         resource.setType(type);
+    //         resource.setSemester(semester);
+    //         resource.setYear(year);
+    //         resource.setBranch(branch);
+    //         resource.setFileUrl(fileUrl);
             
-            // Store ImageKit file ID for future operations (if you added this field)
-            // resource.setImageKitFileId(result.getFileId());
+    //         // Store ImageKit file ID for future operations (if you added this field)
+    //         // resource.setImageKitFileId(result.getFileId());
             
-            // Store thumbnail URL if available (if you added this field)
-            // if (result.getThumbnail() != null && !result.getThumbnail().isEmpty()) {
-            //     resource.setThumbnailUrl(result.getThumbnail());
-            // }
+    //         // Store thumbnail URL if available (if you added this field)
+    //         // if (result.getThumbnail() != null && !result.getThumbnail().isEmpty()) {
+    //         //     resource.setThumbnailUrl(result.getThumbnail());
+    //         // }
 
-            ExamResource savedResource = repository.save(resource);
-            logger.info("Resource metadata saved to database with ID: {}", savedResource.getId());
+    //         ExamResource savedResource = repository.save(resource);
+    //         logger.info("Resource metadata saved to database with ID: {}", savedResource.getId());
             
-            return savedResource;
+    //         return savedResource;
             
-        } catch (IOException e) {
-            logger.error("Failed to upload file to ImageKit", e);
-            throw e;
-        } catch (RuntimeException e) {
-            logger.error("Unexpected runtime error during upload", e);
-            throw new IOException("Unexpected runtime error during upload: " + e.getMessage(), e);
-        }
-    }
+    //     } catch (IOException e) {
+    //         logger.error("Failed to upload file to ImageKit", e);
+    //         throw e;
+    //     } catch (RuntimeException e) {
+    //         logger.error("Unexpected runtime error during upload", e);
+    //         throw new IOException("Unexpected runtime error during upload: " + e.getMessage(), e);
+    //     }
+    // }
 
     public List<ExamResource> fetchResources(Integer semester, String branch, String type, Integer year) {
         logger.debug("Fetching resources with semester: {}, branch: {}, type: {}, year: {}", semester, branch, type, year);
@@ -272,4 +286,44 @@ public class ResourceService {
             return null;
         }
     }
+
+    public UploadResourceResponse uploadData(UploadResourceRequest uploadRequest) throws IOException {
+
+        // Decode base64 file data
+        byte[] fileData = Base64.getDecoder().decode(uploadRequest.getFileData());
+        // Upload to S3
+        S3UploadResult s3Result = s3Service.uploadFile(
+            fileData,
+            uploadRequest.getFileName(),
+            uploadRequest.getContentType(),
+            uploadRequest.getBranch(),
+            uploadRequest.getSemester(),
+            uploadRequest.getType(),
+            S3Constants.S3_BUCKET_NAME
+        );
+        ExamResource resource = repository.save(ExamResource.builder()
+            .subjectCode(uploadRequest.getSubjectCode())
+            .subjectName(uploadRequest.getSubjectName())
+            .professorName(uploadRequest.getProfessorName())
+            .type(uploadRequest.getType())
+            .semester(uploadRequest.getSemester())
+            .year(uploadRequest.getYear())
+            .branch(uploadRequest.getBranch())
+            .s3Key(s3Result.getS3Key())
+            .fileUrl(s3Result.getFileUrl())
+            .fileSize(s3Result.getFileSize())
+            .uploadedAt(LocalDateTime.now())
+            .build()
+        );
+
+        return UploadResourceResponse.builder()
+            .message("File uploaded successfully")
+            .success(true)
+            .resourceId(resource.getId())
+            .s3Key(s3Result.getS3Key())
+            .fileUrl(s3Result.getFileUrl())
+            .build();
+
+    }
+
 }
