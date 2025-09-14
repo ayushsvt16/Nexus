@@ -184,7 +184,35 @@
        <scope>provided</scope>
     </dependency>
 
+    <dependency>
+       <groupId>com.amazonaws.serverless</groupId>
+       <artifactId>aws-serverless-java-container-springboot3</artifactId>
+       <version>2.0.2</version>
+    </dependency>
+
+    <dependency>
+    <groupId>software.amazon.awssdk</groupId>
+    <artifactId>dynamodb</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>software.amazon.awssdk</groupId>
+    <artifactId>dynamodb-enhanced</artifactId>
+</dependency>
     </dependencies>
+
+    <dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>bom</artifactId>
+            <version>2.25.19</version> <!-- keep all AWS SDKs in sync -->
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+
 
     <build>
         <plugins>

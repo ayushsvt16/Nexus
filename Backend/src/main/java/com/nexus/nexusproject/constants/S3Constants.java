@@ -41,7 +41,7 @@ public class S3Constants {
     public static final String ENV_RDS_DATABASE = "RDS_DATABASE";
     
     // Default Values
-    public static final String DEFAULT_AWS_REGION = "us-east-1";
+    public static final String DEFAULT_AWS_REGION = "ap-south-1";
     public static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
     
     // Lambda Function Names

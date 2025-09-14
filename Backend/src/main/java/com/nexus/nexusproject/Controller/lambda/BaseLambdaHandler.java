@@ -17,7 +17,6 @@ import lombok.extern.log4j.Log4j2;
  */
 @RequiredArgsConstructor
 @Log4j2
-@RestController
 public abstract class BaseLambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
   @Autowired
@@ -81,7 +80,7 @@ public abstract class BaseLambdaHandler implements RequestHandler<APIGatewayProx
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            logger.warn("Invalid integer parameter {}: {}", paramName, value);
+            log.warn("Invalid integer parameter {}: {}", paramName, value);
             return defaultValue;
         }
     }

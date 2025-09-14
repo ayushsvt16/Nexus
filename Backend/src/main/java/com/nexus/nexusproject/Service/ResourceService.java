@@ -8,6 +8,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,10 @@ import io.imagekit.sdk.models.FileCreateRequest;
 import io.imagekit.sdk.models.results.Result;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
 
 @Service // tells that it this class will have resource-related business logic
 @RequiredArgsConstructor
@@ -49,6 +54,10 @@ public class ResourceService {
     
     @Autowired
     private S3service s3Service;
+
+    @Autowired
+    private DynamoDbTable<ExamResource> examResourceTable;
+
     
     // till here 
     // imagekit is ready to upload files to the cloud
@@ -301,7 +310,12 @@ public class ResourceService {
             uploadRequest.getType(),
             S3Constants.S3_BUCKET_NAME
         );
-        ExamResource resource = repository.save(ExamResource.builder()
+        
+        String pk = uploadRequest.getBranch() + "#" + uploadRequest.getSemester();
+        String sk = uploadRequest.getYear() + "#" + uploadRequest.getType() + "#" + UUID.randomUUID();
+        saveExamResource(ExamResource.builder()
+            .pk(pk)
+            .sk(sk)
             .subjectCode(uploadRequest.getSubjectCode())
             .subjectName(uploadRequest.getSubjectName())
             .professorName(uploadRequest.getProfessorName())
@@ -319,11 +333,125 @@ public class ResourceService {
         return UploadResourceResponse.builder()
             .message("File uploaded successfully")
             .success(true)
-            .resourceId(resource.getId())
             .s3Key(s3Result.getS3Key())
             .fileUrl(s3Result.getFileUrl())
             .build();
 
     }
+
+    private void saveExamResource(ExamResource resource) {
+        log.info("Saving exam resource: {}", resource);
+        examResourceTable.putItem(resource);  // ✅ save directly
+    }
+
+    public List<ExamResource> fetchExamResources(Integer semester, String branch, String type, Integer year) {
+        logger.debug("Fetching resources with FROM LAMBDA semester: {}, branch: {}, type: {}, year: {}", semester, branch, type, year);
+        
+        // If no filters are provided, return all resources
+        if (semester == null && branch == null && type == null && year == null) {
+            List<ExamResource> allResources = repository.findAll();
+            logger.info("Found {} total resources (no filters applied)", allResources.size());
+            return allResources;
+        }
+        
+        // Apply filters based on what parameters are provided
+        List<ExamResource> resources;
+        
+        if (semester != null && branch != null && type != null && year != null) {
+            // All four parameters provided - you'll need to add this method to repository
+            resources = findBySemesterAndBranchAndTypeAndYear(semester, branch, type, year);
+            logger.info("Found {} resources for semester: {}, branch: {}, type: {}, year: {}", 
+                        resources.size(), semester, branch, type, year);
+        } else if (semester != null && branch != null && type != null) {
+            // Three parameters provided (existing method)
+            resources = findBySemesterAndBranchAndType(semester, branch, type);
+            logger.info("Found {} resources for semester: {}, branch: {}, type: {}", 
+                        resources.size(), semester, branch, type);
+        } else if (year != null) {
+            // Only year filter provided
+            resources = findByYear(year);
+            logger.info("Found {} resources for year: {}", resources.size(), year);
+        } else if (semester != null) {
+            // Only semester filter provided
+            resources = findBySemester(semester);
+            logger.info("Found {} resources for semester: {}", resources.size(), semester);
+        } else if (branch != null) {
+            // Only branch filter provided
+            resources = findByBranch(branch);
+            logger.info("Found {} resources for branch: {}", resources.size(), branch);
+        } else if (type != null) {
+            // Only type filter provided
+            resources = findByType(type);
+            logger.info("Found {} resources for type: {}", resources.size(), type);
+        } else {
+            // Partial filtering combinations - for now, fall back to findAll()
+            // You can add more specific repository methods as needed
+            resources = findAll();
+            logger.info("Found {} resources (partial filtering combination not implemented, returning all)", resources.size());
+        }
+        
+        return resources;
+    }
+
+     // Query by branch+semester+type
+    public List<ExamResource> findBySemesterAndBranchAndType(Integer semester, String branch, String type) {
+        String pk = branch + "#" + semester;
+
+        return examResourceTable.query(r -> r.queryConditional(
+                QueryConditional.keyEqualTo(Key.builder().partitionValue(pk).build())
+        )).items().stream()
+                .filter(item -> item.getType().equals(type))
+                .toList();
+    }
+
+    // Query by branch+semester+type+year
+    public List<ExamResource> findBySemesterAndBranchAndTypeAndYear(Integer semester, String branch, String type, Integer year) {
+        String pk = branch + "#" + semester;
+
+        return examResourceTable.query(r -> r.queryConditional(
+                QueryConditional.keyEqualTo(Key.builder().partitionValue(pk).build())
+        )).items().stream()
+                .filter(item -> item.getType().equals(type) && item.getYear().equals(year))
+                .toList();
+    }
+
+    // Query by year (scan)
+    public List<ExamResource> findByYear(Integer year) {
+        return examResourceTable.scan().items().stream()
+                .filter(item -> item.getYear().equals(year))
+                .toList();
+    }
+
+    // Query by semester (scan)
+    public List<ExamResource> findBySemester(Integer semester) {
+        return examResourceTable.scan().items().stream()
+                .filter(item -> item.getSemester().equals(semester))
+                .toList();
+    }
+
+    // Query by branch (scan)
+    public List<ExamResource> findByBranch(String branch) {
+        return examResourceTable.scan().items().stream()
+                .filter(item -> item.getBranch().equals(branch))
+                .toList();
+    }
+
+    // Query by type (scan)
+    public List<ExamResource> findByType(String type) {
+        return examResourceTable.scan().items().stream()
+                .filter(item -> item.getType().equals(type))
+                .toList();
+    }
+
+    public List<ExamResource> findAll() {
+    List<ExamResource> results = new ArrayList<>();
+
+    // Scan the entire table
+    examResourceTable.scan().items().forEach(results::add);
+
+    return results;
+}
+
+
 
 }

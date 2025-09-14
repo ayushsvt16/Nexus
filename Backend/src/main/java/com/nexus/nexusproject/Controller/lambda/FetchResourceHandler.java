@@ -41,7 +41,7 @@ public class FetchResourceHandler extends BaseLambdaHandler {
 
       log.info("Fetch parameters - semester: {}, branch: {}, type: {}, year: {}", semester, branch, type, year);
       
-      List<ExamResource> examResources = examResourceService.fetchResources(semester, branch, type, year);
+      List<ExamResource> examResources = examResourceService.fetchExamResources(semester, branch, type, year);
 
       for (ExamResource resource : examResources) {
             if (resource.getS3Key() != null && !resource.getS3Key().trim().isEmpty()) {

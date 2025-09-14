@@ -12,7 +12,6 @@ import com.nexus.nexusproject.DTO.ApiGatewayResponse;
 import com.nexus.nexusproject.DTO.UploadResourceRequest;
 import com.nexus.nexusproject.DTO.UploadResourceResponse;
 import com.nexus.nexusproject.Service.ResourceService;
-import com.nexus.nexusproject.Service.S3service;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.ValidationException;
